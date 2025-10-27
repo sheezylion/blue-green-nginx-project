@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  app_blue:
+    image: ${BLUE_IMAGE}
+    environment:
+      - PORT=${PORT:-3000}
+      - RELEASE_ID=${RELEASE_ID_BLUE}
+      - APP_POOL=blue
+    ports:
+      - "8081:3000" # direct access for grader /chaos/*
+
+  app_green:
+    image: ${GREEN_IMAGE}
+    environment:
+      - PORT=${PORT:-3000}
+      - RELEASE_ID=${RELEASE_ID_GREEN}
+      - APP_POOL=green
+    ports:
+      - "8082:3000" # direct access
+
+  nginx:
+    image: nginx:stable
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app_blue
+      - app_green
