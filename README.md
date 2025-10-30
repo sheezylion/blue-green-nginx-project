@@ -127,3 +127,60 @@ This extends Stage 2 by adding structured Nginx access logs, a Python log watche
    ```bash
    docker compose up -d
    ```
+
+   <img width="1025" height="584" alt="Screenshot 2025-10-30 at 15 56 26" src="https://github.com/user-attachments/assets/a9c986cf-7fc4-4f15-af2e-457a8d96b7b3" />
+
+3. Check watcher log
+
+```
+docker compose logs -f alert_watcher
+```
+
+<img width="913" height="534" alt="Screenshot 2025-10-30 at 16 10 22" src="https://github.com/user-attachments/assets/3539c9bf-9f9e-4c3c-b27a-200b03d21234" />
+
+4. Post chaos to trigger slack and notify
+
+```
+curl -X POST "http://localhost:8081/chaos/start?mode=timeout"
+```
+
+```
+for i in {1..200}; do curl -s http://localhost:8080/version > /dev/null; sleep 0.05; done
+```
+
+This triggers slack watcher and you get notification showing failover detected from blue to green
+
+<img width="1680" height="976" alt="Screenshot 2025-10-30 at 16 44 34" src="https://github.com/user-attachments/assets/08947975-30c6-441b-84a0-d71fc590f467" />
+
+5. Stop chaos and it turns back to blue
+
+```
+curl -X POST http://localhost:8081/chaos/stop
+```
+
+If you curl the version it turns back to blue
+
+```
+curl -i http://localhost:8080/version
+```
+
+
+<img width="896" height="384" alt="Screenshot 2025-10-30 at 16 13 08" src="https://github.com/user-attachments/assets/ec162d60-e46c-4dc5-8b27-2e011029bf90" />
+
+6. For error rate threashold notification
+
+```
+curl -X POST "http://localhost:8081/chaos/start?mode=error"
+```
+
+```
+for i in {1..200}; do curl -s http://localhost:8080/version > /dev/null; sleep 0.05; done
+```
+
+This triggers slack watcher and you get error notification
+
+
+<img width="1577" height="524" alt="Screenshot 2025-10-30 at 17 20 47" src="https://github.com/user-attachments/assets/1b8ecaba-f3c6-4f56-9975-8dd1f588d54a" />
+
+
+
