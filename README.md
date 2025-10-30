@@ -179,6 +179,12 @@ for i in {1..200}; do curl -s http://localhost:8080/version > /dev/null; sleep 0
 
 This triggers slack watcher and you get error notification
 
+To stop error 
+
+```
+curl -X POST http://localhost:8081/chaos/stop
+```
+
 
 <img width="1577" height="524" alt="Screenshot 2025-10-30 at 17 20 47" src="https://github.com/user-attachments/assets/1b8ecaba-f3c6-4f56-9975-8dd1f588d54a" />
 
