@@ -8,7 +8,7 @@ services:
       - RELEASE_ID=${RELEASE_ID_BLUE}
       - APP_POOL=blue
     ports:
-      - "8081:3000" # direct access for grader /chaos/*
+      - "8081:3000"
 
   app_green:
     image: ${GREEN_IMAGE}
@@ -17,7 +17,7 @@ services:
       - RELEASE_ID=${RELEASE_ID_GREEN}
       - APP_POOL=green
     ports:
-      - "8082:3000" # direct access
+      - "8082:3000"
 
   nginx:
     image: nginx:stable
@@ -25,6 +25,28 @@ services:
       - "8080:80"
     volumes:
       - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf:ro
+      - nginx_logs:/var/log/nginx
     depends_on:
       - app_blue
       - app_green
+
+  alert_watcher:
+    image: python:3.11-slim
+    depends_on:
+      - nginx
+    environment:
+      - ACTIVE_POOL=${ACTIVE_POOL}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - ERROR_RATE_THRESHOLD=${ERROR_RATE_THRESHOLD:-2}
+      - WINDOW_SIZE=${WINDOW_SIZE:-200}
+      - ALERT_COOLDOWN_SEC=${ALERT_COOLDOWN_SEC:-300}
+      - MAINTENANCE_MODE=${MAINTENANCE_MODE:-false}
+      - LOG_PATH=${LOG_PATH:-/var/log/nginx/access.json.log}
+    working_dir: /app
+    volumes:
+      - ./watcher:/app
+      - nginx_logs:/var/log/nginx:ro
+    command: >
+      sh -c "pip install -r requirements.txt && python -u watcher.py"
+volumes:
+  nginx_logs:

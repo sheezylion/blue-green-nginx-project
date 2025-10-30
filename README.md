@@ -42,6 +42,7 @@ RELEASE_ID_GREEN=v1.0.0-green
 ```
 docker-compose up -d
 ```
+
 <img width="1028" height="504" alt="Screenshot 2025-10-27 at 13 43 03" src="https://github.com/user-attachments/assets/e82822b6-13ec-4790-b774-4eba1fcc3999" />
 
 Check all services are running:
@@ -64,8 +65,8 @@ curl -i http://localhost:8080/version
 # X-App-Pool: blue
 # X-Release-Id: v1.0.0-blue
 ```
-<img width="640" height="224" alt="Screenshot 2025-10-27 at 15 16 09" src="https://github.com/user-attachments/assets/660fe19b-3c77-46e7-b50a-09fd0661096d" />
 
+<img width="640" height="224" alt="Screenshot 2025-10-27 at 15 16 09" src="https://github.com/user-attachments/assets/660fe19b-3c77-46e7-b50a-09fd0661096d" />
 
 ### Test Automatic Failover
 
@@ -95,6 +96,7 @@ sleep 10
 # Verify Blue is active again
 curl -i http://localhost:8080/version
 ```
+
 <img width="868" height="349" alt="Screenshot 2025-10-27 at 15 23 18" src="https://github.com/user-attachments/assets/6b784e2f-e47c-4a94-96c4-7e5fff5bcf41" />
 
 The script will:
@@ -105,4 +107,23 @@ The script will:
 - Test stability (20 requests, should be ≥95% success)
 - Stop chaos and verify recovery
 
+# Blue-Green with Nginx Auto-Failover + Slack Alerts
 
+This extends Stage 2 by adding structured Nginx access logs, a Python log watcher, and Slack alerts for failovers and high error rates.
+
+## Prerequisites
+
+- Docker and Docker Compose
+- Slack Incoming Webhook URL
+- App images provided by the instructor
+- `.env` based on `.env.example`
+
+## Setup
+
+1. Copy `.env.example` to `.env` and fill values:
+   - `SLACK_WEBHOOK_URL=...`
+   - `ACTIVE_POOL=blue` (or green if you start that way)
+2. Bring up the stack:
+   ```bash
+   docker compose up -d
+   ```
